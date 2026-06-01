@@ -33,6 +33,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState('25');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [historyAccount, setHistoryAccount] = useState<AdAccount | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -123,8 +124,10 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
     }
     
     const updates: Partial<AdAccount> = {};
+    const nowISO = new Date().toISOString();
     if (bulkAction === 'IN_STOCK' || bulkAction === 'OUT_OF_STOCK') {
       updates.inventoryStatus = bulkAction as any;
+      updates.exportDate = bulkAction === 'OUT_OF_STOCK' ? nowISO : null;
     } else if (bulkAction === 'BW_SYNC') {
       updates.blueWhaleSync = true;
     } else if (bulkAction === 'BW_UNSYNC') {
@@ -298,7 +301,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
     <div className="flex flex-col h-full animate-in fade-in duration-500 p-4 md:p-6 overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-4 md:mb-6 shrink-0 w-full overflow-x-auto">
         <div className="flex-1 min-w-0 flex items-center justify-between w-full">
-          <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-white mb-1 truncate">{t('inventory')}</h2>
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white mb-1 truncate">{t('inventory')}</h2>
         </div>
         <div className="flex items-center gap-2 md:gap-3 flex-wrap">
           <Button variant="primary" onClick={() => setShowImportModal(true)} className="text-[11px] md:text-xs font-bold rounded flex items-center gap-2">
@@ -330,12 +333,66 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
             }} 
           />
         )}
+
+        {historyAccount && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setHistoryAccount(null)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="bg-white dark:bg-zinc-900 border-2 border-blue-500/30 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[85dvh] relative z-10"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+                  Lịch sử cập nhật: {historyAccount.name}
+                </h2>
+                <button onClick={() => setHistoryAccount(null)} className="p-2 hover:bg-zinc-100 dark:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-5 flex-1 overflow-y-auto space-y-4">
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 mb-1">Người upload đầu tiên</div>
+                  <div className="font-bold text-blue-400">{historyAccount.createdBy || 'Unknown'}</div>
+                </div>
+                
+                <h3 className="text-sm font-bold uppercase text-zinc-500 dark:text-zinc-400 tracking-wider">Lịch sử tác động (Audit Log)</h3>
+                {!historyAccount.auditLogs || historyAccount.auditLogs.length === 0 ? (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 italic">Chưa có ghi nhận lịch sử.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {[...historyAccount.auditLogs].reverse().map((log, i) => (
+                      <div key={i} className="flex flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg text-sm">
+                        <div className="flex justify-between mb-1">
+                          <span className="font-bold text-zinc-700 dark:text-zinc-200">{log.action}</span>
+                          <span className="text-zinc-500 dark:text-zinc-400 text-xs">{new Date(log.timestamp).toLocaleString('vi-VN')}</span>
+                        </div>
+                        <div className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-400">Thực hiện bởi: <span className="text-blue-400 font-medium">{log.user}</span></div>
+                        <div className="text-zinc-500 dark:text-zinc-400 text-xs mt-1 bg-white dark:bg-zinc-900 p-2 rounded whitespace-pre-wrap">{log.details}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
 
       {/* Filter Bar */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-wrap gap-4 shrink-0 shadow-xl mb-6 items-start">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 flex flex-wrap gap-4 shrink-0 shadow-xl mb-6 items-start">
         <div className="w-full lg:flex-1 lg:min-w-[360px] space-y-1.5 min-w-0">
-          <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider flex justify-between">
+          <label className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider flex justify-between">
             {t('filterUid')}
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -353,9 +410,9 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                />
             </div>
             <div className="relative flex-1 min-w-0">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-zinc-500" />
+              <Search className="w-4 h-4 absolute left-3 top-3 text-zinc-500 dark:text-zinc-400" />
               <textarea
-                className="w-full bg-zinc-950 border border-zinc-800 rounded pl-9 pr-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-blue-600 focus:border-blue-600 outline-none resize-none h-10 transition-all font-mono placeholder:text-zinc-600 placeholder:font-sans"
+                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded pl-9 pr-3 py-2 text-xs text-zinc-600 dark:text-zinc-300 focus:ring-1 focus:ring-blue-600 focus:border-blue-600 outline-none resize-none h-10 transition-all font-mono placeholder:text-zinc-600 placeholder:font-sans"
                 placeholder={t('searchPlaceholder')}
                 value={filters.searchQuery}
                 onChange={(e) => setFilters(f => ({ ...f, searchQuery: e.target.value }))}
@@ -365,7 +422,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
         </div>
         
         <div className="w-full sm:w-44 space-y-1.5 shrink-0">
-          <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">{t('status')}</label>
+          <label className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider">{t('status')}</label>
           <Select
             value={filters.fbStatus}
             onChange={(val) => setFilters(f => ({ ...f, fbStatus: val as any }))}
@@ -379,7 +436,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
         </div>
         
         <div className="w-full sm:w-40 space-y-1.5 shrink-0">
-           <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">{t('warehouse')}</label>
+           <label className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider">{t('warehouse')}</label>
            <Select
             value={filters.inventoryStatus}
             onChange={(val) => setFilters(f => ({ ...f, inventoryStatus: val as any }))}
@@ -392,12 +449,12 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
         </div>
 
         <div className="flex items-center gap-2 pt-0 lg:pt-[22px] w-full lg:w-auto shrink-0">
-           <Button variant="primary" onClick={() => {}} className="flex-1 lg:flex-none h-10 px-6 bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold rounded transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+           <Button variant="primary" onClick={() => {}} className="flex-1 lg:flex-none h-10 px-6 bg-blue-700 hover:bg-blue-600 text-zinc-900 dark:text-white text-xs font-bold rounded transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
             {t('applyFilters')}
            </Button>
            <button 
              onClick={() => setFilters({ searchQuery: '', searchField: 'all', accountTypes: [], inventoryStatus: 'ALL', fbStatus: 'ALL', dateRange: { start: null, end: null } })}
-             className="h-10 px-3 shrink-0 bg-zinc-950 border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-bold rounded transition-all flex items-center justify-center group"
+             className="h-10 px-3 shrink-0 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-700 dark:text-zinc-200 text-xs font-bold rounded transition-all flex items-center justify-center group"
              title={t('resetFilters')}
            >
              <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
@@ -407,7 +464,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
       
       {/* Bulk Actions */}
       {selectedIds.size > 0 && (
-        <div className="bg-zinc-900 border border-zinc-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl shadow-blue-900/10 mb-4 animate-in fade-in slide-in-from-top-2 shrink-0">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl shadow-blue-900/10 mb-4 animate-in fade-in slide-in-from-top-2 shrink-0">
           <div className="text-sm font-medium text-blue-400 font-mono sm:pl-2 text-center sm:text-left w-full sm:w-auto">
             {t('selected')}: {selectedIds.size} {t('accounts')}
           </div>
@@ -434,17 +491,17 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
       )}
 
       {/* Main Table */}
-      <div className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden flex flex-col shadow-2xl min-h-0">
+      <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col shadow-2xl min-h-0">
         <div className="overflow-auto flex-1 select-none">
           <table className="w-full text-left text-[11px] whitespace-nowrap">
-            <thead className="bg-zinc-950 text-zinc-500 border-b border-zinc-800 uppercase tracking-widest font-bold tracking-wider text-[10px] sticky top-0 z-10">
+            <thead className="bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800 uppercase tracking-widest font-bold tracking-wider text-[10px] sticky top-0 z-10">
               <tr>
                 <th className="px-5 py-3 w-10">
                   <input 
                     type="checkbox" 
                     checked={selectedIds.size > 0 && selectedIds.size === filteredAccounts.length}
                     onChange={handleSelectAll}
-                    className="w-3.5 h-3.5 accent-blue-600 rounded bg-zinc-900 border-zinc-700"
+                    className="w-3.5 h-3.5 accent-blue-600 rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700"
                   />
                 </th>
                 <th className="px-5 py-3">{t('status')}</th>
@@ -453,17 +510,18 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                 <th className="px-5 py-3">{t('type')} / {t('limit')}</th>
                 <th className="px-5 py-3">{t('payment')}</th>
                 <th className="px-5 py-3">{t('warehouse')}</th>
+                <th className="px-5 py-3">Ngày nhập/xuất kho</th>
                 <th className="px-5 py-3">{t('bwSync')}</th>
                 <th className="px-5 py-3">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800 font-sans text-white text-[13px]">
+            <tbody className="divide-y divide-zinc-800 font-sans text-zinc-900 dark:text-white text-[13px]">
               {paginatedAccounts.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-16 text-center text-zinc-500 font-sans">
+                  <td colSpan={9} className="px-4 py-16 text-center text-zinc-500 dark:text-zinc-400 font-sans">
                     <div className="flex flex-col items-center justify-center">
                       <Layers className="w-10 h-10 text-zinc-700 mb-3" />
-                      <p className="text-sm font-medium text-zinc-400 font-bold">{t('noAccountsFound')}</p>
+                      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 font-bold">{t('noAccountsFound')}</p>
                       <p className="text-xs mt-1 text-zinc-600">{t('tryAdjustingFilters')}</p>
                     </div>
                   </td>
@@ -476,7 +534,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                     key={acc.id} 
                     className={cn(
                       "transition-colors", 
-                      isSelected ? "bg-blue-900/10" : "hover:bg-zinc-800/20"
+                      isSelected ? "bg-blue-900/10" : "hover:bg-zinc-100 dark:bg-zinc-800/20"
                     )}
                   >
                     <td 
@@ -488,16 +546,16 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                         type="checkbox" 
                         checked={isSelected}
                         readOnly // managed by parent handlers
-                        className="w-3.5 h-3.5 accent-blue-600 rounded bg-zinc-900 border-zinc-700 pointer-events-none"
+                        className="w-3.5 h-3.5 accent-blue-600 rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 pointer-events-none"
                       />
                     </td>
                     <td className="px-5 py-3">
                       {getStatusBadge(acc.fbStatus)}
                     </td>
                     <td className="px-5 py-3">
-                      <div className="font-sans font-bold text-white mb-1 truncate max-w-[150px]">{acc.name}</div>
+                      <div className="font-sans font-bold text-zinc-900 dark:text-white mb-1 truncate max-w-[150px]">{acc.name}</div>
                       <div 
-                        className="text-[11px] text-zinc-400 font-mono hover:text-blue-400 cursor-pointer flex items-center gap-1 group"
+                        className="text-[11px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 font-mono hover:text-blue-400 cursor-pointer flex items-center gap-1 group"
                         onClick={(e) => handleCopyId(acc.id, e)}
                         title="Copy ID"
                       >
@@ -511,14 +569,14 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-zinc-400">
+                    <td className="px-5 py-3 text-zinc-500 dark:text-zinc-400 dark:text-zinc-400">
                       {acc.linkedPartners.length > 0 ? (
                         <div className="flex flex-col gap-2">
                           {acc.linkedPartners.map((p, i) => (
                             <div key={i} className="flex flex-col">
-                              <span className="text-white font-medium text-xs truncate max-w-[120px]" title={p.name}>{p.name}</span>
+                              <span className="text-zinc-900 dark:text-white font-medium text-xs truncate max-w-[120px]" title={p.name}>{p.name}</span>
                               <div 
-                                className="text-[10px] text-zinc-500 font-mono hover:text-blue-400 cursor-pointer flex items-center gap-1 group"
+                                className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono hover:text-blue-400 cursor-pointer flex items-center gap-1 group"
                                 onClick={(e) => handleCopyId(p.id, e)}
                                 title="Copy Partner ID"
                               >
@@ -535,29 +593,45 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                       )}
                     </td>
                     <td className="px-5 py-3 whitespace-normal max-w-[200px]">
-                      <span className="text-zinc-500">{acc.accountScope} / {acc.accountType}</span> <br/>
-                      <span className="text-white">
+                      <span className="text-zinc-500 dark:text-zinc-400">{acc.accountScope} / {acc.accountType}</span> <br/>
+                      <span className="text-zinc-900 dark:text-white">
                         {acc.limit === -1 ? 'No Limit' : `$${acc.limit} / Daily`}
                       </span>
                     </td>
                     <td className="px-5 py-3">
-                      <span className={acc.paymentCard ? "text-zinc-300" : "text-rose-300"}>
+                      <span className={acc.paymentCard ? "text-zinc-600 dark:text-zinc-300" : "text-rose-300"}>
                         {acc.paymentCard || 'Declined'}
                       </span>
                     </td>
                     <td className="px-5 py-3">
                       {getInventoryBadge(acc.inventoryStatus)}
                     </td>
+                    <td className="px-5 py-3 text-[10px] text-zinc-500 dark:text-zinc-400">
+                      <div><span className="font-bold">Nhập:</span> {acc.importDate ? new Date(acc.importDate).toLocaleDateString('vi-VN') : '-'}</div>
+                      <div><span className="font-bold">Xuất:</span> {acc.exportDate ? new Date(acc.exportDate).toLocaleDateString('vi-VN') : '-'}</div>
+                    </td>
                     <td className="px-5 py-3">
                       {getBWSyncBadge(acc.blueWhaleSync)}
                     </td>
                     <td className="px-5 py-3 gap-2 flex items-center">
                        <button 
-                         className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[10px] transition-colors"
+                         className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded text-[10px] transition-colors"
+                         title="Xem lịch sử thay đổi"
+                         onClick={() => setHistoryAccount(acc)}
+                       >
+                         Lịch sử
+                       </button>
+                       <button 
+                         className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded text-[10px] transition-colors"
                          title={t('updateStockTooltip')}
                          onClick={() => {
                            const newStatus = acc.inventoryStatus === 'IN_STOCK' ? 'OUT_OF_STOCK' : 'IN_STOCK';
-                           setAccounts(prev => prev.map(a => a.id === acc.id ? { ...a, inventoryStatus: newStatus } : a));
+                           const nowISO = new Date().toISOString();
+                           setAccounts(prev => prev.map(a => a.id === acc.id ? { 
+                             ...a, 
+                             inventoryStatus: newStatus,
+                             exportDate: newStatus === 'OUT_OF_STOCK' ? nowISO : null
+                           } : a));
                            updateAccount(acc.id, { inventoryStatus: newStatus });
                          }}
                        >
@@ -567,7 +641,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                          className={cn(
                            "px-2 py-1 border rounded text-[10px] transition-colors",
                            acc.blueWhaleSync 
-                            ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border-zinc-700" 
+                            ? "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700" 
                             : "bg-blue-900/30 hover:bg-blue-900/50 text-blue-400 border-blue-900/50"
                          )}
                          title={t('updateBWTooltip')}
@@ -586,8 +660,8 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-zinc-800 p-3 md:p-4 bg-zinc-950 flex flex-col lg:flex-row justify-between items-center shrink-0 gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-[10px] text-zinc-500 uppercase tracking-widest font-bold font-mono text-center sm:text-left">
+        <div className="border-t border-zinc-200 dark:border-zinc-800 p-3 md:p-4 bg-zinc-50 dark:bg-zinc-950 flex flex-col lg:flex-row justify-between items-center shrink-0 gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-bold font-mono text-center sm:text-left">
             <div>
               {t('showing')} {((currentPage - 1) * parseInt(itemsPerPage) || 0) + (paginatedAccounts.length > 0 ? 1 : 0)} - {Math.min(currentPage * (parseInt(itemsPerPage) || filteredAccounts.length), filteredAccounts.length)} {t('of')} {filteredAccounts.length}
             </div>
@@ -615,7 +689,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-8 h-8 flex items-center justify-center rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:bg-zinc-800 hover:text-white disabled:opacity-50 disabled:hover:bg-zinc-950 disabled:hover:text-zinc-400 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-zinc-900 dark:text-white disabled:opacity-50 disabled:hover:bg-zinc-50 dark:bg-zinc-950 disabled:hover:text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -635,8 +709,8 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                       className={cn(
                         "w-8 h-8 flex items-center justify-center rounded text-xs font-mono font-medium transition-colors",
                         currentPage === p 
-                          ? "bg-blue-600 text-white" 
-                          : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                          ? "bg-blue-600 text-zinc-900 dark:text-white" 
+                          : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-zinc-900 dark:text-white"
                       )}
                     >
                       {p}
@@ -647,7 +721,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="w-8 h-8 flex items-center justify-center rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:bg-zinc-800 hover:text-white disabled:opacity-50 disabled:hover:bg-zinc-950 disabled:hover:text-zinc-400 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:bg-zinc-100 dark:bg-zinc-800 hover:text-zinc-900 dark:text-white disabled:opacity-50 disabled:hover:bg-zinc-50 dark:bg-zinc-950 disabled:hover:text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

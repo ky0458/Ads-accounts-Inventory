@@ -8,13 +8,20 @@ export interface Partner {
   name: string;
 }
 
+export interface AuditLog {
+  action: 'IMPORT' | 'UPDATE' | 'DELETE' | string;
+  user: string;
+  timestamp: string;
+  details: string;
+}
+
 export interface AdAccount {
   id: string;
   name: string;
   fbStatus: FBAccountStatus;
   inventoryStatus: InventoryStatus;
   importDate: string; // ISO String
-  exportDate?: string; // ISO String
+  exportDate?: string | null; // ISO String
   linkedPartners: Partner[];
   paymentCard?: string; // Last 4 digits e.g. "VISA 1234"
   limit: number; // Daily spend limit in USD. -1 for No Limit.
@@ -24,6 +31,8 @@ export interface AdAccount {
   currency: string;
   spend: number;
   blueWhaleSync?: boolean;
+  createdBy?: string;
+  auditLogs?: AuditLog[];
 }
 
 export type FilterState = {

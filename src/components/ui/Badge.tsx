@@ -17,7 +17,7 @@ export function Badge({ className, variant = 'neutral', ...props }: BadgeProps) 
           'text-rose-500 bg-rose-500/10': variant === 'danger',
           'text-amber-500 bg-amber-500/10': variant === 'warning',
           'text-blue-400 bg-blue-400/10': variant === 'info' || variant === 'purple',
-          'text-zinc-500 bg-zinc-800': variant === 'neutral',
+          'text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800': variant === 'neutral',
         },
         className
       )}
