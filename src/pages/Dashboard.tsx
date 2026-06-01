@@ -119,7 +119,7 @@ export function Dashboard({ accounts }: DashboardProps) {
             {typeData.map((entry, index) => (
               <div key={entry.name} className="flex items-center gap-2 text-xs">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                <span className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-400">{entry.name}</span>
+                <span className="text-zinc-500 dark:text-zinc-400">{entry.name}</span>
               </div>
             ))}
           </div>

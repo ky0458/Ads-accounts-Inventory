@@ -144,7 +144,7 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
             <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
             {t('importModalTitle')}
           </h2>
-          <button onClick={onClose} className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:text-white transition-colors bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
+          <button onClick={onClose} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 p-2 rounded-full">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -180,12 +180,12 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
                 onChange={(val) => setAccountType(val as AccountType)}
                 menuPosition="top"
                 options={[
-                  { value: 'Cá nhân', label: 'Cá nhân' },
+                  { value: 'Cá nhân', label: t('typePersonal') as string },
                   { value: 'BM1', label: 'BM1' },
                   { value: 'BM3', label: 'BM3' },
                   { value: 'BM5', label: 'BM5' },
                   { value: 'VO', label: 'VO' },
-                  { value: 'REGULAR', label: 'Thường / limit' },
+                  { value: 'REGULAR', label: t('typeRegular') as string },
                   { value: 'NOLIMIT', label: t('noLimit') }
                 ]}
               />
@@ -198,7 +198,7 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
                 menuPosition="top"
                 options={[
                   { value: 'BM', label: 'Business Manager' },
-                  { value: 'PERSONAL', label: 'Cá nhân' }
+                  { value: 'PERSONAL', label: t('typePersonal') as string }
                 ]}
               />
             </div>
@@ -206,14 +206,14 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
         </div>
 
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 rounded-b-xl flex justify-between items-center">
-          <div className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 font-mono">
+          <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
             {loading ? (
               <span className="flex items-center text-blue-400">
                 <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                 {progress}
               </span>
             ) : (
-              <span>{idsText.split(/[\n,;]+/).filter(Boolean).length} IDs ready</span>
+              <span>{(t('idsReady') as string).replace('{count}', idsText.split(/[\n,;]+/).filter(Boolean).length.toString())}</span>
             )}
           </div>
           <div className="flex gap-2">

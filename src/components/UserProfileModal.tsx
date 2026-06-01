@@ -113,7 +113,7 @@ export function UserProfileModal({ user, onClose, onUpdate }: Props) {
              <UserIcon className="w-5 h-5 text-blue-500" />
              Hồ sơ người dùng
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:text-white">
+          <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -169,7 +169,7 @@ export function UserProfileModal({ user, onClose, onUpdate }: Props) {
                <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-4">
                  {!codeSent ? (
                    <div>
-                     <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 mb-3">Mã 6 số sẽ được gửi tới <b>{user.email}</b> để xác thực trước khi bật 2FA.</p>
+                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">Mã 6 số sẽ được gửi tới <b>{user.email}</b> để xác thực trước khi bật 2FA.</p>
                      <Button type="button" variant="primary" size="sm" onClick={handleSend2FACode} disabled={twoFaLoading}>
                        Gửi mã xác nhận
                      </Button>

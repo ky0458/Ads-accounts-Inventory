@@ -260,7 +260,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
         {mode === 'verify_email' && (
           <form onSubmit={handleVerifyEmail} className="space-y-4">
              <h1 className="text-xl font-bold tracking-tight text-center">{t('verifyEmailTitle')}</h1>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 text-center">{t('codeSentTo')} {email}</p>
+             <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">{t('codeSentTo')} {email}</p>
              <div>
                 <label className="text-xs uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider mb-1.5 block">{t('verifyCode')}</label>
                 <Input value={code} onChange={e => setCode(e.target.value)} required placeholder="123456" maxLength={6} className="text-center tracking-widest text-lg font-mono" />
@@ -275,7 +275,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
         {mode === 'verify_2fa' && (
           <form onSubmit={handleVerify2FA} className="space-y-4">
              <h1 className="text-xl font-bold tracking-tight text-center">{t('verify2FATitle')}</h1>
-             <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 text-center">{t('codeSentTo')} {email}</p>
+             <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">{t('codeSentTo')} {email}</p>
              <div>
                 <label className="text-xs uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider mb-1.5 block">{t('securityCode')}</label>
                 <Input value={code} onChange={e => setCode(e.target.value)} required placeholder="123456" maxLength={6} className="text-center tracking-widest text-lg font-mono" />

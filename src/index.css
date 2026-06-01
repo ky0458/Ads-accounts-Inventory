@@ -13,3 +13,16 @@ body {
   -webkit-font-smoothing: antialiased;
   @apply bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-zinc-300 dark:bg-zinc-700 rounded;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  @apply bg-zinc-400 dark:bg-zinc-600;
+}

@@ -21,7 +21,7 @@ export function SettingsPage() {
     <div className="max-w-4xl space-y-6 animate-in slide-in-from-bottom-2 duration-500 fade-in p-4 md:p-6">
        <div className="mb-4 md:mb-6">
         <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-white mb-1">{t('settingsTitle')}</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 mt-1">{t('tokenHelp')}</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{t('tokenHelp')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,7 +62,7 @@ export function SettingsPage() {
                 Hướng dẫn cấu hình
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 space-y-3">
+            <CardContent className="text-sm text-zinc-500 dark:text-zinc-400 space-y-3">
               <p>Hệ thống tự động quét <strong>tất cả BM</strong> mà Via đang có mặt. Không cần cấu hình từng BM ID riêng lẻ.</p>
               
               <ol className="list-decimal pl-5 space-y-2 text-xs">

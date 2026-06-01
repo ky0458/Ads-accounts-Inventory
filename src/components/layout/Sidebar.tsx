@@ -43,7 +43,7 @@ export function Sidebar({ currentTab, onTabChange, isOpen, setIsOpen }: SidebarP
             <p className="text-[10px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mt-1 font-bold">{t('enterpriseManager')}</p>
           </div>
           {setIsOpen && (
-            <button className="md:hidden text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:text-white" onClick={() => setIsOpen(false)}>
+            <button className="md:hidden text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white" onClick={() => setIsOpen(false)}>
               <X className="w-5 h-5" />
             </button>
           )}
@@ -60,7 +60,7 @@ export function Sidebar({ currentTab, onTabChange, isOpen, setIsOpen }: SidebarP
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                   active 
                     ? "bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100" 
-                    : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:bg-white dark:bg-zinc-900 hover:text-zinc-800 dark:text-zinc-100"
+                    : "text-zinc-500 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-100"
                 )}
               >
                 <item.icon className="w-4 h-4 md:w-4 md:h-4" />
@@ -70,7 +70,7 @@ export function Sidebar({ currentTab, onTabChange, isOpen, setIsOpen }: SidebarP
           })}
         </nav>
 
-        <div className="px-4 py-3 flex items-center gap-3 border-t border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 shrink-0">
+        <div className="px-4 py-3 flex items-center gap-3 border-t border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 dark:text-zinc-400 shrink-0">
            <div className="text-xl leading-none" title={lang === 'vi' ? '🇻🇳' : lang === 'zh' ? '🇨🇳' : '🇬🇧'}>
              {lang === 'vi' ? '🇻🇳' : lang === 'zh' ? '🇨🇳' : '🇬🇧'}
            </div>
@@ -93,8 +93,8 @@ export function Sidebar({ currentTab, onTabChange, isOpen, setIsOpen }: SidebarP
             <HelpCircle className="w-5 h-5 text-zinc-500 dark:text-zinc-400 shrink-0 mt-0.5" />
             <div>
               <h4 className="text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400 font-bold mb-1">{t('needHelp')}</h4>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 leading-relaxed mb-3">{t('readSetup')}</p>
-              <button className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:text-white transition-colors" onClick={() => onTabChange('setup')}>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-3">{t('readSetup')}</p>
+              <button className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors" onClick={() => onTabChange('setup')}>
                  {t('viewGuide')} &rarr;
               </button>
             </div>

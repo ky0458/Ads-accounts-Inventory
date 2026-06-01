@@ -86,7 +86,7 @@ export default function App() {
              <Database className="w-4 h-4 text-blue-500" />
              Ads Account Inventory
            </div>
-           <button onClick={() => setIsSidebarOpen(true)} className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-400 hover:text-zinc-900 dark:text-white">
+           <button onClick={() => setIsSidebarOpen(true)} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
              <Menu className="w-6 h-6" />
            </button>
         </div>
@@ -103,7 +103,7 @@ export default function App() {
              </button>
              <button 
                onClick={() => setShowProfile(true)}
-               className="flex items-center gap-3 hover:bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-zinc-300 dark:border-zinc-700"
+               className="flex items-center gap-3 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-zinc-300 dark:hover:border-zinc-700"
              >
                 <div className="text-right">
                    <div className="text-sm font-bold text-zinc-700 dark:text-zinc-200">{user.username}</div>
@@ -117,7 +117,7 @@ export default function App() {
                   )}
                 </div>
              </button>
-            <button onClick={logout} className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-red-400 transition-colors hover:bg-zinc-100 dark:bg-zinc-800 rounded-lg" title="Đăng xuất">
+            <button onClick={logout} className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-red-400 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg" title="Đăng xuất">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
