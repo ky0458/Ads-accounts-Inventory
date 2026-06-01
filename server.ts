@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
+import nodemailer from 'nodemailer';
 import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
@@ -21,6 +22,17 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Nodemailer Connection
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -105,22 +117,49 @@ function generateCode() {
 async function sendEmailVerificationCode(email: string, type: string) {
   const code = generateCode();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-  await VerificationCode.create({ email, code, expiresAt, type });
-  console.log(`\n\n=== MOCK EMAIL ===\nTo: ${email}\nAction: ${type}\nCode: ${code}\n==================\n`);
+  
+  if (MONGODB_URI) {
+    await VerificationCode.create({ email, code, expiresAt, type });
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || 'noreply@inventory-system.com',
+    to: email,
+    subject: type === 'REGISTER' ? 'Mã xác nhận đăng ký / Registration Code' : 'Mã xác thực 2 bước / 2FA Code',
+    html: `
+      <div style="font-family: sans-serif; max-w-md; margin: auto;">
+        <h2>Xác thực Email</h2>
+        <p>Mã xác thực của bạn là: <strong style="font-size: 24px;">${code}</strong></p>
+        <p>Mã này sẽ hết hạn trong vòng 10 phút.</p>
+      </div>
+    `
+  };
+
+  try {
+    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+      await transporter.sendMail(mailOptions);
+      console.log(`Email sent to ${email}`);
+    } else {
+      console.log(`\n\n=== MOCK EMAIL (No SMTP config) ===\nTo: ${email}\nAction: ${type}\nCode: ${code}\n==================\n`);
+    }
+  } catch (err: any) {
+    console.error('Email sending failed:', err.message);
+  }
+
   return code;
 }
 
 // Auth Routes
 app.post('/api/auth/register', async (req: any, res: any) => {
-  if (!MONGODB_URI) return res.status(503).json({ error: 'MongoDB not configured' });
+  if (!MONGODB_URI) return res.status(503).json({ error: 'MongoDB không được cấu hình (MONGODB_URI missing).' });
   try {
     const username = String(req.body.username || '');
     const email = String(req.body.email || '');
     const password = String(req.body.password || '');
-    if (!username || !email || !password) return res.status(400).json({ error: 'Missing fields' });
+    if (!username || !email || !password) return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin.' });
     
     let user = await User.findOne({ $or: [{ username }, { email }] });
-    if (user) return res.status(400).json({ error: 'Username or email already exists' });
+    if (user) return res.status(400).json({ error: 'Username hoặc Email đã tồn tại.' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const isFirstUser = (await User.countDocuments()) === 0;
@@ -130,15 +169,18 @@ app.post('/api/auth/register', async (req: any, res: any) => {
       email,
       password: hashedPassword,
       role: isFirstUser ? 'ADMIN' : 'USER',
-      emailVerified: false
+      emailVerified: true
     });
 
-    await sendEmailVerificationCode(email, 'REGISTER');
+    // await sendEmailVerificationCode(email, 'REGISTER');
 
-    res.json({ success: true, message: 'Verification code sent to email', userId: user._id });
-  } catch (error) {
+    // res.json({ success: true, message: 'Verification code sent to email', userId: user._id });
+
+    const token = jwt.sign({ id: user._id, username: user.username, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ success: true, token, user: { username: user.username, role: user.role, email: user.email, avatarUrl: user.avatarUrl, twoFactorEnabled: user.twoFactorEnabled } });
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({ error: error.message || 'Đăng ký thất bại. Xin thử lại.' });
   }
 });
 
@@ -179,16 +221,16 @@ app.post('/api/auth/login', async (req: any, res: any) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
-    if (!user.emailVerified) {
-       // resend code
-       await sendEmailVerificationCode(user.email, 'REGISTER');
-       return res.json({ requireEmailVerification: true, email: user.email });
-    }
+    // if (!user.emailVerified) {
+    //    // resend code
+    //    await sendEmailVerificationCode(user.email, 'REGISTER');
+    //    return res.json({ requireEmailVerification: true, email: user.email });
+    // }
 
-    if (user.twoFactorEnabled) {
-       await sendEmailVerificationCode(user.email, '2FA_LOGIN');
-       return res.json({ require2FA: true, email: user.email });
-    }
+    // if (user.twoFactorEnabled) {
+    //    await sendEmailVerificationCode(user.email, '2FA_LOGIN');
+    //    return res.json({ require2FA: true, email: user.email });
+    // }
 
     const token = jwt.sign({ id: user._id, username: user.username, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ success: true, token, user: { username: user.username, role: user.role, email: user.email, avatarUrl: user.avatarUrl, twoFactorEnabled: user.twoFactorEnabled } });

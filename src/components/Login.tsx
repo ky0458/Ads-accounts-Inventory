@@ -65,6 +65,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [code, setCode] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -100,6 +101,12 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    if (password !== confirmPassword) {
+      setError(t('passwordMismatch') as string);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
@@ -110,7 +117,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       
-      setMode('verify_email');
+      onLoginSuccess(data);
     } catch(err: any) {
       setError(err.message);
     } finally {
@@ -235,6 +242,10 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (data: {token:
              <div>
                 <label className="text-xs uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider mb-1.5 block">{t('passwordLabel')}</label>
                 <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+             </div>
+             <div>
+                <label className="text-xs uppercase text-zinc-500 dark:text-zinc-400 font-bold tracking-wider mb-1.5 block">{t('confirmPasswordLabel')}</label>
+                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} />
              </div>
              {error && <p className="text-red-500 text-xs text-center">{error}</p>}
              <Button type="submit" variant="primary" className="w-full h-11" disabled={loading}>
