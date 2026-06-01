@@ -1,0 +1,6 @@
+{
+  "name": "FB Ads Inventory",
+  "description": "Quản lý và theo dõi trạng thái tài khoản quảng cáo Facebook trong kho. Đồng bộ dữ liệu Business Manager, theo dõi limit, thẻ và xuất báo cáo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
