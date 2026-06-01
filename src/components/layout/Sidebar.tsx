@@ -25,20 +25,20 @@ export function Sidebar({ currentTab, onTabChange, isOpen, setIsOpen }: SidebarP
       {/* Mobile overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm" 
+          className="fixed inset-0 bg-black/60 z-[80] md:hidden backdrop-blur-sm" 
           onClick={() => setIsOpen?.(false)} 
         />
       )}
 
       <aside className={cn(
-        "fixed md:static inset-y-0 left-0 w-64 border-r border-zinc-800 bg-zinc-950 flex flex-col flex-shrink-0 z-50 transition-transform duration-300 md:translate-x-0 h-[100dvh]",
+        "fixed md:static inset-y-0 left-0 w-64 border-r border-zinc-800 bg-zinc-950 flex flex-col flex-shrink-0 z-[90] transition-transform duration-300 md:translate-x-0 h-[100dvh]",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="p-4 md:p-6 border-b border-zinc-800 flex items-center justify-between">
           <div>
             <h1 className="text-lg md:text-xl font-semibold tracking-tight text-white flex items-center gap-2">
-              <span className="w-3 h-3 bg-blue-600 rounded-full"></span>
-              FB Asset Hub
+              <Database className="w-5 h-5 text-blue-500" />
+              Ads Account Inventory
             </h1>
             <p className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 font-bold">{t('enterpriseManager')}</p>
           </div>

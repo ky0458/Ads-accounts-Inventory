@@ -1,6 +1,6 @@
 export type FBAccountStatus = 'ACTIVE' | 'DISABLED' | 'UNSETTLED' | 'IN_REVIEW' | 'PENDING_CLOSURE';
 export type InventoryStatus = 'IN_STOCK' | 'OUT_OF_STOCK';
-export type AccountType = 'REGULAR' | 'VO' | 'NOLIMIT';
+export type AccountType = 'Cá nhân' | 'BM1' | 'BM3' | 'BM5' | 'VO' | 'REGULAR' | 'NOLIMIT' | string;
 export type AccountScope = 'BM' | 'PERSONAL';
 
 export interface Partner {

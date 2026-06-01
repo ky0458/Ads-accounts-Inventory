@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/Badge';
 import { Filter, Download, Plus, Search, ChevronDown, RefreshCw, Layers, X, ChevronLeft, ChevronRight, Copy, Check, Upload } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { exportToCSV, cn } from '../lib/utils';
+import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-client';
 import { useI18n } from '../lib/i18n';
 import { Select } from '../components/ui/Select';
@@ -315,28 +316,30 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
         </div>
       </div>
 
-      {showImportModal && (
-        <ImportModal 
-          onClose={() => setShowImportModal(false)} 
-          onImportSuccess={(newAccounts) => {
-            // Merge into current active set to avoid refresh wait
-            setAccounts(prev => {
-              const prevMap = new Map(prev.map(a => [a.id, a]));
-              newAccounts.forEach(a => prevMap.set(a.id, a));
-              return Array.from(prevMap.values());
-            });
-          }} 
-        />
-      )}
+      <AnimatePresence>
+        {showImportModal && (
+          <ImportModal 
+            onClose={() => setShowImportModal(false)} 
+            onImportSuccess={(newAccounts) => {
+              // Merge into current active set to avoid refresh wait
+              setAccounts(prev => {
+                const prevMap = new Map(prev.map(a => [a.id, a]));
+                newAccounts.forEach(a => prevMap.set(a.id, a));
+                return Array.from(prevMap.values());
+              });
+            }} 
+          />
+        )}
+      </AnimatePresence>
 
       {/* Filter Bar */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-wrap gap-4 shrink-0 shadow-xl mb-6 items-start">
-        <div className="flex-1 min-w-[320px] space-y-1.5">
+        <div className="w-full lg:flex-1 lg:min-w-[360px] space-y-1.5 min-w-0">
           <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider flex justify-between">
             {t('filterUid')}
           </label>
-          <div className="flex gap-2">
-            <div className="w-32 shrink-0 relative z-[60]">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="w-full sm:w-32 shrink-0">
                <Select
                   value={filters.searchField}
                   onChange={(val) => setFilters(f => ({ ...f, searchField: val }))}
@@ -349,7 +352,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                   ]}
                />
             </div>
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <Search className="w-4 h-4 absolute left-3 top-3 text-zinc-500" />
               <textarea
                 className="w-full bg-zinc-950 border border-zinc-800 rounded pl-9 pr-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-blue-600 focus:border-blue-600 outline-none resize-none h-10 transition-all font-mono placeholder:text-zinc-600 placeholder:font-sans"
@@ -361,7 +364,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
           </div>
         </div>
         
-        <div className="w-44 space-y-1.5">
+        <div className="w-full sm:w-44 space-y-1.5 shrink-0">
           <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">{t('status')}</label>
           <Select
             value={filters.fbStatus}
@@ -375,7 +378,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
           />
         </div>
         
-        <div className="w-40 space-y-1.5">
+        <div className="w-full sm:w-40 space-y-1.5 shrink-0">
            <label className="text-[10px] uppercase text-zinc-500 font-bold tracking-wider">{t('warehouse')}</label>
            <Select
             value={filters.inventoryStatus}
@@ -388,13 +391,13 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
           />
         </div>
 
-        <div className="flex items-center gap-2 pt-[22px]">
-           <Button variant="primary" onClick={() => {}} className="h-10 px-6 bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold rounded transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+        <div className="flex items-center gap-2 pt-0 lg:pt-[22px] w-full lg:w-auto shrink-0">
+           <Button variant="primary" onClick={() => {}} className="flex-1 lg:flex-none h-10 px-6 bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold rounded transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
             {t('applyFilters')}
            </Button>
            <button 
              onClick={() => setFilters({ searchQuery: '', searchField: 'all', accountTypes: [], inventoryStatus: 'ALL', fbStatus: 'ALL', dateRange: { start: null, end: null } })}
-             className="h-10 px-3 bg-zinc-950 border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-bold rounded transition-all flex items-center justify-center group"
+             className="h-10 px-3 shrink-0 bg-zinc-950 border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-bold rounded transition-all flex items-center justify-center group"
              title={t('resetFilters')}
            >
              <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
@@ -404,26 +407,26 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
       
       {/* Bulk Actions */}
       {selectedIds.size > 0 && (
-        <div className="bg-zinc-900 border border-zinc-500/30 rounded-xl p-3 flex items-center justify-between shadow-xl shadow-blue-900/10 mb-4 animate-in fade-in slide-in-from-top-2 shrink-0">
-          <div className="text-sm font-medium text-blue-400 font-mono pl-2">
+        <div className="bg-zinc-900 border border-zinc-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl shadow-blue-900/10 mb-4 animate-in fade-in slide-in-from-top-2 shrink-0">
+          <div className="text-sm font-medium text-blue-400 font-mono sm:pl-2 text-center sm:text-left w-full sm:w-auto">
             {t('selected')}: {selectedIds.size} {t('accounts')}
           </div>
-          <div className="flex items-center gap-3">
-             <div className="w-48">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
+             <div className="w-full sm:w-48">
                <Select
-                 value={bulkAction}
-                 onChange={setBulkAction}
-                 placeholder={`-- ${t('selectBulkMode')} --`}
-                 options={[
-                   { value: 'IN_STOCK', label: t('markInStock') },
-                   { value: 'OUT_OF_STOCK', label: t('markOutStock') },
-                   { value: 'BW_SYNC', label: t('markBWSynced') },
-                   { value: 'BW_UNSYNC', label: t('markBWNotSynced') },
-                   { value: 'SYNC_FB', label: t('syncSelectedFB') }
-                 ]}
+                  value={bulkAction}
+                  onChange={setBulkAction}
+                  placeholder={`-- ${t('selectBulkMode')} --`}
+                  options={[
+                    { value: 'IN_STOCK', label: t('markInStock') },
+                    { value: 'OUT_OF_STOCK', label: t('markOutStock') },
+                    { value: 'BW_SYNC', label: t('markBWSynced') },
+                    { value: 'BW_UNSYNC', label: t('markBWNotSynced') },
+                    { value: 'SYNC_FB', label: t('syncSelectedFB') }
+                  ]}
                />
              </div>
-             <Button variant="primary" size="sm" onClick={applyBulkAction} disabled={!bulkAction} className="h-10 px-4">
+             <Button variant="primary" size="sm" onClick={applyBulkAction} disabled={!bulkAction} className="h-10 px-4 w-full sm:w-auto">
                {t('applyAction')}
              </Button>
           </div>
@@ -434,7 +437,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
       <div className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden flex flex-col shadow-2xl min-h-0">
         <div className="overflow-auto flex-1 select-none">
           <table className="w-full text-left text-[11px] whitespace-nowrap">
-            <thead className="bg-zinc-950 text-zinc-500 border-b border-zinc-800 uppercase tracking-widest font-bold font-serif italic sticky top-0 z-10">
+            <thead className="bg-zinc-950 text-zinc-500 border-b border-zinc-800 uppercase tracking-widest font-bold tracking-wider text-[10px] sticky top-0 z-10">
               <tr>
                 <th className="px-5 py-3 w-10">
                   <input 
@@ -454,7 +457,7 @@ export function Inventory({ accounts, setAccounts }: InventoryProps) {
                 <th className="px-5 py-3">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800 font-mono text-zinc-300">
+            <tbody className="divide-y divide-zinc-800 font-sans text-white text-[13px]">
               {paginatedAccounts.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-16 text-center text-zinc-500 font-sans">

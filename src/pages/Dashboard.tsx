@@ -43,7 +43,7 @@ export function Dashboard({ accounts }: DashboardProps) {
         <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
           <p className="text-xs text-zinc-500 uppercase font-medium mb-1">{t('totalAssigned')}</p>
           <div className="flex justify-between items-end">
-            <h3 className="text-2xl font-semibold italic serif tracking-tight text-white">{stats.total}</h3>
+            <h3 className="text-2xl font-semibold tracking-tight text-white">{stats.total}</h3>
             <Boxes className="w-5 h-5 text-zinc-600 mb-1" />
           </div>
         </div>
@@ -51,7 +51,7 @@ export function Dashboard({ accounts }: DashboardProps) {
         <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
           <p className="text-xs text-zinc-500 uppercase font-medium mb-1">{t('liveAccounts')}</p>
           <div className="flex justify-between items-end">
-             <h3 className="text-2xl font-semibold italic serif tracking-tight text-emerald-400">{stats.active}</h3>
+             <h3 className="text-2xl font-semibold tracking-tight text-emerald-400">{stats.active}</h3>
              <Activity className="w-5 h-5 text-emerald-600 mb-1" />
           </div>
         </div>
@@ -59,7 +59,7 @@ export function Dashboard({ accounts }: DashboardProps) {
         <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
           <p className="text-xs text-zinc-500 uppercase font-medium mb-1">{t('disabledAccs')}</p>
           <div className="flex justify-between items-end">
-             <h3 className="text-2xl font-semibold italic serif tracking-tight text-rose-500">{stats.disabled}</h3>
+             <h3 className="text-2xl font-semibold tracking-tight text-rose-500">{stats.disabled}</h3>
              <ShieldAlert className="w-5 h-5 text-rose-600 mb-1" />
           </div>
         </div>
@@ -67,7 +67,7 @@ export function Dashboard({ accounts }: DashboardProps) {
         <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
           <p className="text-xs text-zinc-500 uppercase font-medium mb-1">{t('outOfStockItems')}</p>
           <div className="flex justify-between items-end">
-            <h3 className="text-2xl font-semibold italic serif tracking-tight text-blue-400">{stats.outOfStock}</h3>
+            <h3 className="text-2xl font-semibold tracking-tight text-blue-400">{stats.outOfStock}</h3>
             <CheckCircle className="w-5 h-5 text-blue-600 mb-1" />
           </div>
         </div>

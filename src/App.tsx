@@ -6,7 +6,7 @@ import { SettingsPage } from './pages/Settings';
 import { MOCK_ACCOUNTS } from './lib/mock-data';
 import { AdAccount } from './types';
 import { fetchAccounts, saveAccounts } from './lib/api';
-import { Menu } from 'lucide-react';
+import { Menu, Database } from 'lucide-react';
 import { Button } from './components/ui/Button';
 
 export default function App() {
@@ -70,8 +70,8 @@ export default function App() {
       <main className="flex-1 flex flex-col h-full relative overflow-hidden w-full">
         <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-950 z-20">
            <div className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
-             <span className="w-2.5 h-2.5 bg-blue-600 rounded-full"></span>
-             FB Asset Hub
+             <Database className="w-4 h-4 text-blue-500" />
+             Ads Account Inventory
            </div>
            <button onClick={() => setIsSidebarOpen(true)} className="text-zinc-400 hover:text-white">
              <Menu className="w-6 h-6" />

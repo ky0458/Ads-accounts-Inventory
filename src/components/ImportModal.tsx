@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as motion from 'motion/react-client';
 import { X, Upload, RefreshCw } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Select } from './ui/Select';
@@ -13,6 +14,8 @@ interface ImportModalProps {
 }
 
 const FIELDS = 'account_id,name,account_status,currency,timezone_name,funding_source_details,spend_cap,amount_spent,business';
+
+import { createPortal } from 'react-dom';
 
 export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
   const { t } = useI18n();
@@ -119,12 +122,29 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-xl shadow-2xl flex flex-col max-h-[90dvh]">
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800 shrink-0">
-          <h2 className="text-lg font-bold">{t('importModalTitle')}</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors">
+  const modalContent = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="bg-zinc-900 border-2 border-blue-500/30 w-full max-w-2xl rounded-2xl shadow-[0_0_50px_rgba(37,99,235,0.15)] flex flex-col max-h-[90dvh] relative z-10"
+      >
+        <div className="flex items-center justify-between p-5 border-b border-zinc-800 shrink-0">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+            {t('importModalTitle')}
+          </h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 p-2 rounded-full">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -140,12 +160,13 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs uppercase text-zinc-500 font-bold">{t('warehouseStatus')}</label>
               <Select
                 value={inventoryStatus}
                 onChange={(val) => setInventoryStatus(val as InventoryStatus)}
+                menuPosition="top"
                 options={[
                   { value: 'IN_STOCK', label: t('inStock') },
                   { value: 'OUT_OF_STOCK', label: t('outStock') }
@@ -157,9 +178,14 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
               <Select
                 value={accountType}
                 onChange={(val) => setAccountType(val as AccountType)}
+                menuPosition="top"
                 options={[
+                  { value: 'Cá nhân', label: 'Cá nhân' },
+                  { value: 'BM1', label: 'BM1' },
+                  { value: 'BM3', label: 'BM3' },
+                  { value: 'BM5', label: 'BM5' },
+                  { value: 'VO', label: 'VO' },
                   { value: 'REGULAR', label: 'Thường / limit' },
-                  { value: 'VO', label: 'Scan' },
                   { value: 'NOLIMIT', label: t('noLimit') }
                 ]}
               />
@@ -169,6 +195,7 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
               <Select
                 value={accountScope}
                 onChange={(val) => setAccountScope(val as AccountScope)}
+                menuPosition="top"
                 options={[
                   { value: 'BM', label: 'Business Manager' },
                   { value: 'PERSONAL', label: 'Cá nhân' }
@@ -197,7 +224,9 @@ export function ImportModal({ onClose, onImportSuccess }: ImportModalProps) {
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 }

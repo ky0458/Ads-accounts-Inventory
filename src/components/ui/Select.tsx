@@ -34,7 +34,7 @@ export function Select({ options, value, onChange, className, placeholder, menuP
   }, []);
 
   return (
-    <div className={cn("relative", isOpen ? "z-[60]" : "z-50", className)} ref={containerRef}>
+    <div className={cn("relative", isOpen ? "z-[60]" : "", className)} ref={containerRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
