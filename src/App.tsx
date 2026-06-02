@@ -107,9 +107,9 @@ export default function App() {
              >
                 <div className="text-right">
                    <div className="text-sm font-bold text-zinc-700 dark:text-zinc-200">{user.username}</div>
-                   <div className="text-[10px] uppercase font-bold text-blue-400">{user.role}</div>
+                   <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 max-w-[100px] truncate" title={user.id}>{user.id}</div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 overflow-hidden flex items-center justify-center shadow-inner">
+                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 overflow-hidden flex items-center justify-center shadow-inner shrink-0">
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (

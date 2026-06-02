@@ -16,7 +16,8 @@ function getHeaders() {
   let username = 'Unknown';
   if (userStr) {
     try {
-      username = JSON.parse(userStr).username;
+      const parsed = JSON.parse(userStr);
+      username = `${parsed.username} [${parsed.id || 'N/A'}]`;
     } catch(e) {}
   }
   headers['x-user-name'] = username;
